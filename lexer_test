@@ -1,0 +1,9 @@
+{
+  print( x );
+  if (True) { ; } else { ; }
+  while (False) { }
+  x = 1;
+  y = x;
+  arr = [1,2,3];
+  arr[2] = 5;
+}

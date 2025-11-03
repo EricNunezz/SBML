@@ -247,3 +247,21 @@ class TupleIndexNode:
 
     def __str__(self):
         return f"TupleIndexNode(#{self.index}({self.tuple_expr}))"
+
+GLOBAL_ENV = {}
+
+def evaluate_any(node, env):
+    if node is None:
+        return None
+    if hasattr(node, "evaluate"):
+        return node.evaluate(env)
+    if hasattr(node, "eval"):
+        return node.eval()
+    return None
+
+@dataclass
+class ProgramNode:
+
+    def __str__(self):
+        return "ProgramNode()"
+

@@ -1,5 +1,17 @@
 Created by PLY version 3.11 (http://www.dabeaz.com/ply)
 
+Unused terminals:
+
+    ASSIGN
+    ELSE
+    ID
+    IF
+    LBRACE
+    PRINT
+    RBRACE
+    SEMI
+    WHILE
+
 Grammar
 
 Rule 0     S' -> expression
@@ -42,16 +54,21 @@ Rule 35    expression -> HASH NUMBER LPAREN expression COMMA RPAREN
 Terminals, with rules where they appear
 
 ANDALSO              : 11
+ASSIGN               : 
 BOOLEAN              : 2
 COMMA                : 28 29 32 35
 CONS                 : 19
 DIV                  : 8
 DIVIDE               : 7
+ELSE                 : 
 EQ                   : 15
 GE                   : 17
 GT                   : 18
 HASH                 : 34 35
+ID                   : 
+IF                   : 
 IN                   : 20
+LBRACE               : 
 LBRACKET             : 25 26 33
 LE                   : 14
 LPAREN               : 21 29 30 34 35
@@ -64,10 +81,14 @@ NUMBER               : 1 34 35
 ORELSE               : 12
 PLUS                 : 4 24
 POWER                : 10
+PRINT                : 
+RBRACE               : 
 RBRACKET             : 25 26 33
 RPAREN               : 21 29 30 34 35
+SEMI                 : 
 STRING               : 3
 TIMES                : 6
+WHILE                : 
 error                : 
 
 Nonterminals, with rules where they appear

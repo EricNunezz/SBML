@@ -16,7 +16,10 @@ tokens = ('NUMBER', 'BOOLEAN','STRING',
           'LT', 'LE', 'EQ', 'NE', 'GE', 'GT',
           'NOT','ANDALSO','ORELSE',
           'IN',
-          'HASH','LPAREN','RPAREN','LBRACKET','RBRACKET','COMMA'
+          'HASH','LPAREN','RPAREN','LBRACKET','RBRACKET','COMMA',
+
+          'ID', 'LBRACE', 'RBRACE', 'SEMI', 'ASSIGN',
+          'PRINT', 'IF', 'ELSE', 'WHILE'
           )
 
 def t_error(t):
@@ -46,6 +49,10 @@ t_LPAREN = r'\('
 t_RPAREN = r'\)'
 t_LBRACKET = r'\['
 t_RBRACKET = r'\]'
+t_LBRACE = r'\{'
+t_RBRACE = r'\}'
+t_SEMI = r';'
+t_ASSIGN = r'='
 t_ignore = ' \t'
 
 def t_NUMBER(t):
@@ -89,6 +96,19 @@ def t_ORELSE(t):
 
 def t_IN(t):
     r'in'
+    return t
+
+reserved = {
+    'print': 'PRINT',
+    'if': 'IF',
+    'else': 'ELSE',
+    'while': 'WHILE',
+}
+
+def t_ID(t):
+    r'[a-zA-Z][a-zA-Z0-9_]*'
+    if t.value in reserved:
+        t.type = reserved[t.value]
     return t
 
 precedence = (
@@ -221,14 +241,14 @@ def p_expression_tuple_index_single(p):
 lexer = lex.lex()
 parser = yacc.yacc()
 
-#test stuff
-#if __name__ == '__main__':
-#    while True:
-#        try:
-#           s = input("sbml> ")
-#        except EOFError:
-#            break
-#        if not s:
-#            continue
-#        result = parser.parse(s, lexer=lexer)
-#        print("Result:", result)
+#if __name__ == "__main__":
+#    data = open("lexer_test").read()
+#    lex = lexer  # already built by PLY at the end of your file
+#    lex.input(data)
+#    try:
+#        while True:
+#            tok = lex.token()
+#            if not tok: break
+#            print(tok.type, repr(tok.value))
+#    except SyntaxError:
+#        print("SYNTAX ERROR")
