@@ -3,6 +3,7 @@
 
 import ply.lex as lex
 import ply.yacc as yacc
+import re
 
 from sbml_ast import (
     NumberNode, BooleanNode, StringNode,
@@ -33,11 +34,11 @@ t_TIMES = r'\*'
 t_DIVIDE = r'/'
 t_CONS = r'::'
 
-t_LT = r'<'
 t_LE = r'<='
-t_EQ = r'=='
-t_NE = r'<>'
 t_GE = r'>='
+t_LT = r'<'
+t_EQ = r'=='
+t_NE = r'<>|!='
 t_GT = r'>'
 t_HASH = r'\#'
 t_COMMA = r','
@@ -48,11 +49,12 @@ t_RBRACKET = r'\]'
 t_ignore = ' \t'
 
 def t_NUMBER(t):
-    r'\d+(\.\d+)?([eE][-+]?\d+)?'
-    if "." in t.value or 'e' in t.value or 'E' in t.value:
-        t.value = float(t.value)
+    r'((\d+\.\d*)|(\.\d+)|(\d+))([eE][+-]?\d+)?'
+    text = t.value
+    if re.search(r'[\.eE]', text):
+        t.value = float(text)
     else:
-        t.value = int(t.value)
+        t.value = int(text)
     return t
 
 def t_BOOLEAN(t):
@@ -99,6 +101,7 @@ precedence = (
     ('left', 'PLUS', 'MINUS'),
     ('left','TIMES', 'DIVIDE', 'DIV', 'MOD'),
     ('right', 'POWER'),
+    ('right', 'UMINUS')
 )
 
 #------------ Parser Section------------
@@ -143,14 +146,18 @@ def p_expression_group(p):
     p[0] = p[2]
 
 def p_error(p):
-    raise SyntaxError("SYNTAX ERROR")
+    if p is None:
+        print("Syntax Error at EQF")
+    else:
+        print(f"SYntax Error at token {p.type}, value = {p.value!r}")
+    raise SyntaxError("SYNtax ERROR")
 
 def p_expression_not(p):
     'expression : NOT expression'
     p[0] = UnaryOpNode('not', p[2])
 
 def p_expression_uminus(p):
-    'expression : MINUS expression'
+    'expression : MINUS expression %prec UMINUS'
     p[0] = UnaryOpNode('-', p[2])
 
 def p_expression_uplus(p):
@@ -198,10 +205,18 @@ def p_expression_list_index(p):
     'expression : expression LBRACKET expression RBRACKET'
     p[0] = IndexNode(p[1], p[3])
 
-def p_expression_tuple_index(p):
-    'expression : HASH NUMBER LPAREN expression RPAREN'
+
+def p_expression_tuple_index_multi(p):
+    'expression : HASH NUMBER LPAREN t_items RPAREN'
     index_node = NumberNode(p[2])
-    p[0] = TupleIndexNode(index_node, p[4])
+    tuple_node = TupleNode(p[4])
+    p[0] = TupleIndexNode(index_node, tuple_node)
+
+def p_expression_tuple_index_single(p):
+    'expression : HASH NUMBER LPAREN expression COMMA RPAREN'
+    index_node = NumberNode(p[2])
+    tuple_node = TupleNode([p[4]])
+    p[0] = TupleIndexNode(index_node, tuple_node)
 
 lexer = lex.lex()
 parser = yacc.yacc()
